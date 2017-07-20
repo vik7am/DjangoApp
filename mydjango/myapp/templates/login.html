@@ -14,6 +14,7 @@
 <body align="center">
 <h1>Instagram</h1>
     <form method="post">
+        {% csrf_token %}
         <input id="username" type="text" name="username" placeholder="Username" value={{ username }}><br>
         <input id="password" type="password" name="password" placeholder="Password" value={{ password }}><br>
         <input type="submit" value="Log In">
