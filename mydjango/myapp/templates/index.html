@@ -18,6 +18,7 @@
     <h1> Instagram</h1>
     <h3>Sign up to see photos and videos from your friends.</h3>
     <form method="post">
+        {% csrf_token %}
         <input id="username" type="text" name="username" placeholder="Username" value={{ username }}><br>
         <input id="name" type="text" name="name" placeholder="Name" value={{ name }}><br>
         <input id="email" type="text" name="email" placeholder="Email" value={{ email }}><br>

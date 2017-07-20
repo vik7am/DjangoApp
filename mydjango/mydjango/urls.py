@@ -15,5 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from myapp.views import signup_view
-urlpatterns = [url('', signup_view)]
+from myapp.views import signup_view, login_view
+
+urlpatterns = [
+    url('login/', login_view),
+    url('', signup_view)
+]
