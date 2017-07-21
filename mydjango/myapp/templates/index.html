@@ -2,51 +2,39 @@
 <head>
     <title>Instagram</title>
     <style>
-    #footer {
-        position:absolute;
-        bottom:0;
-        height:20px;
-        }
     input {
         margin:5px;
         padding:5px;
         font-size:25px;
+
     }
-    form {
-        width:400px;
-        padding:25px;
-        border: 1px solid ;
-    }
-    p {
-        border: 1px solid ;
-        width:400px;
-        padding:25px;
-    }
-    body {
-        background-color:#fafafa;
-    }
+    a { color: inherit; }
 
 </style>
 </head>
-<body  align="center">
-    <h1> Instagram</h1>
-    <h3>Sign up to see photos and videos from your friends.</h3>
+<body  align="center" style="background-color:#FFF; margin:0px; padding:0px">
+    <div style="color:white; font-size:50px; padding:10px; background-color:#00796B;"> Instagram</div>
+    <img src="https://lh3.googleusercontent.com/K4x1RjVE_PIPI7IV2PJj9bnYOmQeJGZvMP80czUw0clMGhVrYavHvaIr2Tf3MUf0L90=h900-rw" style="float:left; max-width: 20%; margin:50px">
+    <img src="https://lh3.googleusercontent.com/RfsBrhjkNVhg52QNm3rQrOk_6u4xvTe4QPoEQFMRofa0_hN2qWVqGmySMl-_TxC5sQ=h900-rw" style="float:right; max-width: 20%; margin:50px">
+    <div style="color:#00796B; font-size:25px; padding:25px;">Sign up to see photos and videos from your friends.</div>
+
     <div align="center">
-    <form method="post" >
+    <form method="post" style="width:400px; padding:25px; border: 2px solid #009688; background-color:white; margin-top:50px">
         {% csrf_token %}
+        <label style="font-size:25px; float:left; margin:20px 35px; color:#00796B" ><b>Signup</b></label>
         <input id="username" type="text" name="username" placeholder="Username" value={{ username }}><br>
         <input id="name" type="text" name="name" placeholder="Name" value={{ name }}><br>
         <input id="email" type="text" name="email" placeholder="Email" value={{ email }}><br>
         <input id="password" type="password" name="password" placeholder="Password" value={{ password }}><br>
         <input type="submit" value="Sign Up">
     </form>
-    </div>
-    <div align="center">
-        <p>
+    </div><br>
+    <div align="center" style=" font-size:20px">
+        <div style="border: 2px solid ; width:400px; padding:25px; background-color:white; color:#009688">
         Have an account? <a href="login/">Log in</a>
-        </p>
+        </div>
     </div>
 
-    <div id="footer">{{today}}</div>
+    <div style="position:absolute; bottom:0; height:20px;">{{today}}</div>
 </body>
 </html>
