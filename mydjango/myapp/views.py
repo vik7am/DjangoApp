@@ -2,9 +2,12 @@
 from __future__ import unicode_literals
 from datetime import datetime
 from django.shortcuts import render, redirect
-from forms import SignUpForm, LoginForm
-from models import UserModel, SessionToken
+from forms import SignUpForm, LoginForm, PostForm
+from models import UserModel, SessionToken, PostModel
 from django.contrib.auth.hashers import make_password, check_password
+from imgurpython import ImgurClient
+from mydjango.settings import BASE_DIR
+
 
 def signup_view(request):
     if request.method == "POST":
@@ -64,3 +67,23 @@ def check_validation(request):
            return session.user
     else:
         return None
+
+
+def post_view(request):
+    user = check_validation(request)
+    if user:
+        if request.method == 'GET':
+            form = PostForm()
+        elif request.method == 'POST':
+            form = PostForm(request.POST, request.FILES)
+            if form.is_valid():
+                image = form.cleaned_data.get('image')
+                caption = form.cleaned_data.get('caption')
+                post = PostModel(user=user, image=image, caption=caption)
+                path = str(BASE_DIR + post.image.url)
+                post.save()
+
+        return render(request, 'post.html', {'form': form})
+
+    else:
+        return redirect('/login/')
