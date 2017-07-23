@@ -12,14 +12,26 @@
         a { color: inherit; }
     </style>
 </head>
-<body align="center" style="background-color:#FFF; margin:0px; padding:0px">
-<div style="color:white; font-size:50px; padding:10px; background-color:#00796B;"> Instagram</div>
-<div style="color:#00796B; font-size:25px; padding:25px;">Welcome to Instagram</div>
+<body style="background-color:#FFF; margin:0px; padding:0px">
+<div style="color:white; font-size:50px; padding:10px; background-color:#00796B;text-align:center"> Instagram</div>
+<div style="color:#00796B; font-size:25px; padding:25px; text-align:center">Welcome to Instagram</div>
+
+<div align="center">
+        <div style="border: 2px solid ; width:640px; padding: 25px 0px; background-color:white; color:#009688; font-size:30px;">
+        Add a new Post <a href="/post/">Log in</a>
+        </div>
+    </div>
 
 <div align="center" style="margin-top:50px; font-size:20px">
-        <div style="border: 2px solid ; width:400px; padding:25px; background-color:white; color:#009688">
-            No Post added <a href="/post/">Add a Post</a>
+
+    {% for post in posts %}
+        <div style="border: 2px solid ; width:640px; padding:0px; background-color:white; color:#00796B; margin-top:50px;">
+            <div style="font-size:35px; padding:10px;text-align:left">{{ post.user.username}} </div><div style="border: 1px solid ;"></div>
+            <img src="{{ post.image_url }}" width="640px">
+            <div style="font-size:20px; padding:10px; text-align:left">{{ post.caption}}</div>
         </div>
+    {% endfor %}
+
 </div><br>
 
 

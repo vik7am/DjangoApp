@@ -57,8 +57,7 @@ def login_view(request):
 
     return render(request, "login.html", {"form": form})
 
-def feed_view(request):
-    return render(request, "feed.html")
+
 
 def check_validation(request):
     if request.COOKIES.get("session_token"):
@@ -80,10 +79,24 @@ def post_view(request):
                 image = form.cleaned_data.get('image')
                 caption = form.cleaned_data.get('caption')
                 post = PostModel(user=user, image=image, caption=caption)
-                path = str(BASE_DIR + post.image.url)
+                path = str(BASE_DIR +"/user_images/"+ post.image.url)
                 post.save()
+                client = ImgurClient("48b3c07ebcf5ecb", "af316e94ac2544c61623ed0fe4a80f2ce928ce33")
+                post.image_url = client.upload_from_path(path, anon=True)['link']
+                post.save()
+                return redirect('/feed/')
 
         return render(request, 'post.html', {'form': form})
 
     else:
         return redirect('/login/')
+
+def feed_view(request):
+    user = check_validation(request)
+    if user:
+        posts = PostModel.objects.all().order_by('created_on')
+        return render(request, 'feed.html', {'posts': posts})
+    else:
+        return redirect('/login/')
+
+    return render(request, 'feed.html', {})
