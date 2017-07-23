@@ -1,34 +1,55 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from datetime import datetime
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from forms import SignUpForm, LoginForm, PostForm
 from models import UserModel, SessionToken, PostModel
 from django.contrib.auth.hashers import make_password, check_password
 from imgurpython import ImgurClient
 from mydjango.settings import BASE_DIR
+from django.contrib import messages
 
 
 def signup_view(request):
     if request.method == "POST":
-        print "Sign up form submitted"
         form = SignUpForm(request.POST)
+        message = ""
         if form.is_valid():
             print "form is valid"
             username = form.cleaned_data["username"]
             name = form.cleaned_data["name"]
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
-            print username+ ":"+ name+ ":"+ email+ ":"+ password+ ":"+ make_password(password)
-            user = UserModel(name=name, password=make_password(password), email=email, username=username)
-            user.save()
-            return render(request, "success.html")
+            if len(username) < 4 or len(password)<5 :
+                if len(username)<4 :
+                    message+="Username length is less than 4"
+                else :
+                    message += "Password length is less than 5"
+                return render(request, "index.html", {"form": form,"message":message})
+            else:
+                return redirect("/login/")
+                user = UserModel(name=name, password=make_password(password), email=email, username=username)
+                user.save()
+            #return render(request, "success.html")
         else:
             print "invalid form"
+
+            if form.data["username"]=="":
+                message+="username is empty | "
+            if form.data["name"]=="":
+                message+="name is empty | "
+            if form.data["email"]=="":
+                message+="email is empty | "
+            if form.data["password"]=="":
+                message+="password is empty | "
+            print message
+            return render(request, "index.html", {"form": form, "message": message})
+
+
+
     elif request.method == "GET":
         form = SignUpForm()
-        today = datetime.now()
-        return render(request, "index.html", {"form" : form, "today":today})
+        return render(request, "index.html", {"form" : form})
 
 
 def login_view(request):
@@ -44,7 +65,7 @@ def login_view(request):
                     token.create_token()
                     token.save()
                     print "Welcome"
-                    response = redirect("feed/")
+                    response = redirect("/feed/")
                     response.set_cookie(key="session_token", value=token.session_token)
                     return response
                 else:

@@ -1,0 +1,50 @@
+body {
+    margin:0px;
+}
+
+#header {
+    color:white;
+    font-size:50px;
+    padding:10px;
+    background-color:#00796B;
+    text-align:center;
+}
+
+input {
+    margin:5px;
+    padding:10px;
+    font-size:25px;
+}
+
+a {
+    color: inherit;
+    text-decoration:none;
+}
+
+.button {
+    background-color: #009688;
+    border: none;
+    color: white;
+    padding: 10px 64px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+#heading1 {
+    color:#00796B;
+    font-size:25px;
+    padding:25px;
+    text-align:center;
+}
+
+#form {
+    width:400px;
+    padding:25px;
+    border: 2px solid #009688;
+    background-color:white;
+    margin-top:50px
+}

@@ -1,42 +1,38 @@
 <!DOCTYPE html>
+
 <head>
     <title>Signup</title>
-    <style>
-    input {
-        margin:5px;
-        padding:10px;
-        font-size:25px;
-
-    }
-    a { color: inherit; }
-
-</style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}" >
+    <script>
+        {% if message %}
+            alert('{{ message }}');
+        {% endif %}
+    </script>
 </head>
-<body style="background-color:#FFF; margin:0px; padding:0px">
-    <div style="color:white; font-size:50px; padding:10px; background-color:#00796B; text-align:center;"> Instagram</div>
-    <!--
-    <img src="https://lh3.googleusercontent.com/K4x1RjVE_PIPI7IV2PJj9bnYOmQeJGZvMP80czUw0clMGhVrYavHvaIr2Tf3MUf0L90=h900-rw" style="float:left; max-width: 20%; margin:50px">
-    <img src="https://lh3.googleusercontent.com/RfsBrhjkNVhg52QNm3rQrOk_6u4xvTe4QPoEQFMRofa0_hN2qWVqGmySMl-_TxC5sQ=h900-rw" style="float:right; max-width: 20%; margin:50px">
-    -->
-    <div style="color:#00796B; font-size:25px; padding:25px; text-align:center; ">Sign up to see photos and videos from your friends.</div>
 
+<body>
+    <div id="header"> Instagram</div>
+    <div id="heading1">Sign up to see photos and videos from your friends.</div>
     <div align="center">
-    <form method="post" style="width:400px; padding:25px; border: 2px solid #009688; background-color:white; margin-top:50px">
+    <form method="post" id="form">
         {% csrf_token %}
-        <label style="font-size:25px; float:left; margin:20px 35px; color:#00796B" ><b>Signup</b></label>
-        <input id="username" type="text" name="username" placeholder="Username" value={{ username }}><br>
-        <input id="name" type="text" name="name" placeholder="Name" value={{ name }}><br>
-        <input id="email" type="text" name="email" placeholder="Email" value={{ email }}><br>
-        <input id="password" type="password" name="password" placeholder="Password" value={{ password }}><br>
-        <input type="submit" value="Sign Up">
+        <label style="font-size:25px; float:left; margin:20px 35px; color:#00796B" > <b>Signup</b> </label>
+        <input id="username" type="text" name="username" placeholder="Username" value={{ username }}> <br>
+        <input id="name" type="text" name="name" placeholder="Name" value={{ name }}> <br>
+        <input id="email" type="text" name="email" placeholder="Email" value={{ email }}> <br>
+        <input id="password" type="password" name="password" placeholder="Password" value={{ password }}> <br>
+        <input type="submit" class="button" value="Sign Up">
     </form>
     </div><br>
     <div align="center" style=" font-size:20px">
         <div style="border: 2px solid ; width:400px; padding:25px; background-color:white; color:#009688">
-        Have an account? <a href="/login/">Log in</a>
+            Have an account? <a href="/login/">Log in</a>
         </div>
     </div>
-
+    <!--
     <div style="position:absolute; bottom:0; height:20px;">{{today}}</div>
+    -->
 </body>
+
 </html>

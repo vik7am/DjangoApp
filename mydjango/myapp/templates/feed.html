@@ -1,40 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Feed</title>
-    <style>
-        input {
-        font-size:25px;
-        margin:5px;
-        padding:10px;
-        }
-        a { color: inherit; }
-    </style>
-</head>
-<body style="background-color:#FFF; margin:0px; padding:0px">
-<div style="color:white; font-size:50px; padding:10px; background-color:#00796B; text-align:center"> Instagram</div>
-<div style="color:#00796B; font-size:25px; padding:25px; text-align:center">Welcome to Instagram</div>
 
-<div align="center">
-        <div style="border: 2px solid ; width:640px; padding: 25px 0px; background-color:white; color:#009688; font-size:30px;">
-        Add a new Post <a href="/post/">Log in</a>
+<head>
+    <title>Feed</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}" >
+    <script>
+        {% if message %}
+            alert('{{ message }}');
+        {% endif %}
+    </script>
+</head>
+
+<body>
+    <div id="header"> Instagram</div>
+    <div id="heading1">Welcome to Instagram</div>
+    <div align="center">
+        <div style="border: 2px solid ; width:640px; padding: 25px 0px; background-color:white; color:#009688; font-size:30px; ">
+            <a href="/post/">Add a new Post </a>
         </div>
     </div>
 
-<div align="center" style="margin-top:50px; font-size:20px">
-
-    {% for post in posts %}
-        <div style="border: 2px solid ; width:640px; padding:0px; background-color:white; color:#00796B; margin-top:50px;">
-            <div style="font-size:35px; padding:10px;text-align:left">{{ post.user.username}} </div><div style="border: 1px solid ;"></div>
-            <img src="{{ post.image_url }}" width="640px">
-            <div style="font-size:20px; padding:10px; text-align:left">{{ post.caption}}</div>
-        </div>
-    {% endfor %}
-
-</div><br>
-
-
-</div>
+    <div align="center" style="margin-top:50px; font-size:20px">
+        {% for post in posts %}
+            <div id="form" style="width:640px; color:#00796B; padding:0px">
+                <div style="font-size:35px; padding:10px;text-align:left">{{ post.user.username}} </div>
+                <div style="border: 1px solid ;"></div>
+                <img src="{{ post.image_url }}" width="640px">
+                <div style="font-size:20px; padding:10px; text-align:left">{{ post.caption}}</div>
+            </div>
+        {% endfor %}
+    </div>
 </body>
+
 </html>
