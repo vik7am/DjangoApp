@@ -12,7 +12,7 @@
     <div id="header"> Instagram</div>
     <div id="heading1">Sign up to see photos and videos from your friends.</div>
     <div align="center">
-    <form name="myform" method="post" id="form" onsubmit="return validateForm()">
+    <form name="myform" method="post" id="form" onsubmit="return validateSignupForm()">
         {% csrf_token %}
         <label style="font-size:25px; float:left; margin:20px 35px; color:#00796B" > <b>Signup</b> </label>
         <input id="username" type="text" name="username" placeholder="Username" value={{ username }}> <br>

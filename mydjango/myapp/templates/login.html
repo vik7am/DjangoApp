@@ -4,6 +4,12 @@
     <title>Login</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}" >
+    <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
+    <script>
+    {% if myerror %}
+        alert("{{myerror}}");
+    {% endif %}
+    </script>
 </head>
 
 <body>
@@ -15,7 +21,7 @@
         </div>
     </div><br>
     <div align="center">
-        <form method="post" id="form">
+        <form name ="myform" method="post" id="form" onsubmit="return validateLoginForm()">
             {% csrf_token %}
             <label style="font-size:25px; float:left; margin:20px 35px; color:#00796B" > <b>Login</b> </label>
             <input id="username" type="text" name="username" placeholder="Username" value={{ username }}><br>

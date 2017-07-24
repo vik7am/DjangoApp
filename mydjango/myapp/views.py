@@ -49,11 +49,13 @@ def login_view(request):
                     return response
                 else:
                     print "Incorrect password"
+                    return render(request, "login.html", {"form": form, "myerror": "Invalid password"})
             else:
                 print "username is invalid"
+                return render(request, "login.html", {"form": form,"myerror":"Invalid username"})
     elif request.method == "GET":
         form = LoginForm()
-    return render(request, "login.html", {"form": form})
+        return render(request, "login.html", {"form": form})
 
 
 def check_validation(request):
