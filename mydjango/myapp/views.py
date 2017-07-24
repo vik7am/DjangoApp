@@ -13,40 +13,19 @@ from django.contrib import messages
 def signup_view(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
-        message = ""
         if form.is_valid():
             print "form is valid"
             username = form.cleaned_data["username"]
             name = form.cleaned_data["name"]
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
-            if len(username) < 4 or len(password)<5 :
-                if len(username)<4 :
-                    message+="Username length is less than 4"
-                else :
-                    message += "Password length is less than 5"
-                return render(request, "index.html", {"form": form,"message":message})
-            else:
-                return redirect("/login/")
-                user = UserModel(name=name, password=make_password(password), email=email, username=username)
-                user.save()
-            #return render(request, "success.html")
+            user = UserModel(name=name, password=make_password(password), email=email, username=username)
+            user.save()
+            print "Id created"
+            return redirect("/login/")
         else:
             print "invalid form"
-
-            if form.data["username"]=="":
-                message+="username is empty | "
-            if form.data["name"]=="":
-                message+="name is empty | "
-            if form.data["email"]=="":
-                message+="email is empty | "
-            if form.data["password"]=="":
-                message+="password is empty | "
-            print message
-            return render(request, "index.html", {"form": form, "message": message})
-
-
-
+            return render(request, "index.html", {"form": form})
     elif request.method == "GET":
         form = SignUpForm()
         return render(request, "index.html", {"form" : form})
@@ -72,12 +51,9 @@ def login_view(request):
                     print "Incorrect password"
             else:
                 print "username is invalid"
-
     elif request.method == "GET":
         form = LoginForm()
-
     return render(request, "login.html", {"form": form})
-
 
 
 def check_validation(request):
@@ -106,18 +82,16 @@ def post_view(request):
                 post.image_url = client.upload_from_path(path, anon=True)['link']
                 post.save()
                 return redirect('/feed/')
-
         return render(request, 'post.html', {'form': form})
-
     else:
         return redirect('/login/')
+
 
 def feed_view(request):
     user = check_validation(request)
     if user:
-        posts = PostModel.objects.all().order_by('created_on')
+        posts = PostModel.objects.all().order_by('-created_on')
         return render(request, 'feed.html', {'posts': posts})
     else:
         return redirect('/login/')
-
     return render(request, 'feed.html', {})
