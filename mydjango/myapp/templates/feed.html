@@ -22,6 +22,13 @@
                 <div style="border: 1px solid ;"></div>
                 <img src="{{ post.image_url }}" width="640px">
                 <div style="font-size:20px; padding:10px; text-align:left">{{ post.caption}}</div>
+                <div>
+                    <form method="POST" action="/like/" align="left">
+                        {% csrf_token %}
+                        <input type="hidden" name="post" value="{{ post.id }}">
+                        <input type="submit" class="button" value="Like">
+                    </form>
+                </div>
             </div>
         {% endfor %}
     </div>

@@ -4,8 +4,14 @@
     <title>Signup</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}" >
-
     <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
+    <script>
+    {% if error %}
+        alert("{{error}}");
+        if( "{{error}}" == "Id Created"){
+            window.location.href = "/login/";}
+    {% endif %}
+    </script>
 </head>
 
 <body>
@@ -23,7 +29,7 @@
     </form>
     </div><br>
     <div align="center" style=" font-size:20px">
-        <div style="border: 2px solid ; width:400px; padding:25px; background-color:white; color:#009688">
+        <div style="border: 2px solid ; width:400px; padding:25px; background-color:white; color:#009688; margin:25px">
             Have an account? <a href="/login/">Log in</a>
         </div>
     </div>

@@ -19,13 +19,14 @@ def signup_view(request):
             name = form.cleaned_data["name"]
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
-            user = UserModel(name=name, password=make_password(password), email=email, username=username)
-            user.save()
+            #user = UserModel(name=name, password=make_password(password), email=email, username=username)
+            #user.save()
             print "Id created"
-            return redirect("/login/")
+            return render(request, "index.html", {"form": form, "error": "Id Created"})
+            #return redirect("/login/")
         else:
             print "invalid form"
-            return render(request, "index.html", {"form": form})
+            return render(request, "index.html", {"form": form,"error": "Invalid data"})
     elif request.method == "GET":
         form = SignUpForm()
         return render(request, "index.html", {"form" : form})
@@ -49,10 +50,10 @@ def login_view(request):
                     return response
                 else:
                     print "Incorrect password"
-                    return render(request, "login.html", {"form": form, "myerror": "Invalid password"})
+                    return render(request, "login.html", {"form": form, "error": "Invalid password"})
             else:
                 print "username is invalid"
-                return render(request, "login.html", {"form": form,"myerror":"Invalid username"})
+                return render(request, "login.html", {"form": form,"error":"Invalid username"})
     elif request.method == "GET":
         form = LoginForm()
         return render(request, "login.html", {"form": form})
@@ -97,3 +98,11 @@ def feed_view(request):
     else:
         return redirect('/login/')
     return render(request, 'feed.html', {})
+
+
+def like_view(request):
+  user = check_validation(request)
+  if user and request.method == 'POST':
+    print 'The user is valid'
+  else:
+    return redirect('/login/')

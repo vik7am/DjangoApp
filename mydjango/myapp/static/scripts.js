@@ -27,12 +27,7 @@ function validateSignupForm() {
         alert("password must be grater than 5 characters");
         return false;
     }
-    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(myform.email.value))
-    {
-        alert("You have entered an invalid email address!");
-        return false;
-    }
-    alert("Id created");
+
 }
 
 function validateLoginForm() {
