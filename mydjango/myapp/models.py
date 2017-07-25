@@ -22,9 +22,15 @@ class SessionToken(models.Model):
         self.session_token = uuid.uuid4()
 
 class PostModel(models.Model):
-  user = models.ForeignKey(UserModel)
-  image = models.FileField(upload_to='user_images')
-  image_url = models.CharField(max_length=255)
-  caption = models.CharField(max_length=240)
-  created_on = models.DateTimeField(auto_now_add=True)
-  updated_on = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(UserModel)
+    image = models.FileField(upload_to='user_images')
+    image_url = models.CharField(max_length=255)
+    caption = models.CharField(max_length=240)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+class LikeModel(models.Model):
+    user = models.ForeignKey(UserModel)
+    post = models.ForeignKey(PostModel)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
