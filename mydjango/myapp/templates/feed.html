@@ -17,7 +17,7 @@
 
     <div align="center" style="margin-top:50px; font-size:20px">
         {% for post in posts %}
-            <div id="form" style="width:640px; color:#00796B; padding:0px">
+            <div id="form" style="width:640px; color:#00796B; padding:0px; margin-top:50px">
                 <div style="font-size:35px; padding:10px;text-align:left">{{ post.user.username}} </div>
                 <div style="border: 1px solid ;"></div>
                 <img src="{{ post.image_url }}" width="640px">
@@ -34,6 +34,19 @@
                         {{ post.like_count }} likes this
                     </div>
                 </form>
+                <form method="POST" action="/comment/">
+                        {% csrf_token %}
+                        <input type="hidden" name="post" value="{{ post.id }}" >
+                        <input type="text" name="comment_text" id="comment_text" placeholder="Make a comment.." value="{{ comment_text }}">
+                            {{ comment_text }}
+                        <input type="submit" class="button" value="Comment">
+                </form>
+                <div style="text-align:left; margin:10px;">
+                    {% for comment in post.comments %}
+                        <p><b>{{ comment.user.username }}:</b> {{ comment.comment_text }}</p>
+                    {% endfor %}
+                </div>
+
             </div>
         {% endfor %}
     </div>
