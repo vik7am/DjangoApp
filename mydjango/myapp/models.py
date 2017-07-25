@@ -28,6 +28,9 @@ class PostModel(models.Model):
     caption = models.CharField(max_length=240)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    @property
+    def like_count(self):
+        return len(LikeModel.objects.filter(post=self))
 
 class LikeModel(models.Model):
     user = models.ForeignKey(UserModel)

@@ -22,13 +22,18 @@
                 <div style="border: 1px solid ;"></div>
                 <img src="{{ post.image_url }}" width="640px">
                 <div style="font-size:20px; padding:10px; text-align:left">{{ post.caption}}</div>
-                <div>
-                    <form method="POST" action="/like/" align="left">
-                        {% csrf_token %}
-                        <input type="hidden" name="post" value="{{ post.id }}">
+                <form method="POST" action="/like/" align="left">
+                    {% csrf_token %}
+                    <input type="hidden" name="post" value="{{ post.id }}">
+                    {% if post.has_liked %}
+                        <input type="submit" class="button" value="Unlike">
+                    {% else %}
                         <input type="submit" class="button" value="Like">
-                    </form>
-                </div>
+                    {% endif %}
+                    <div style="display:inline-block">
+                        {{ post.like_count }} likes this
+                    </div>
+                </form>
             </div>
         {% endfor %}
     </div>

@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 from datetime import datetime
 from django.shortcuts import render, redirect, render_to_response
-from forms import SignUpForm, LoginForm, PostForm
-from models import UserModel, SessionToken, PostModel
+from forms import SignUpForm, LoginForm, PostForm, LikeForm
+from models import UserModel, SessionToken, PostModel, LikeModel
 from django.contrib.auth.hashers import make_password, check_password
 from imgurpython import ImgurClient
 from mydjango.settings import BASE_DIR
@@ -94,6 +94,10 @@ def feed_view(request):
     user = check_validation(request)
     if user:
         posts = PostModel.objects.all().order_by('-created_on')
+        for post in posts:
+            existing_like = LikeModel.objects.filter(post_id=post.id, user=user).first()
+            if existing_like:
+                post.has_liked = True
         return render(request, 'feed.html', {'posts': posts})
     else:
         return redirect('/login/')
@@ -101,8 +105,16 @@ def feed_view(request):
 
 
 def like_view(request):
-  user = check_validation(request)
-  if user and request.method == 'POST':
-    print 'The user is valid'
-  else:
-    return redirect('/login/')
+    user = check_validation(request)
+    if user and request.method == 'POST':
+        form = LikeForm(request.POST)
+        if form.is_valid():
+            post_id = form.cleaned_data.get('post').id
+            existing_like = LikeModel.objects.filter(post_id=post_id, user=user).first()
+            if not existing_like:
+                LikeModel.objects.create(post_id=post_id, user=user)
+            else:
+                existing_like.delete()
+            return redirect('/feed/')
+    else:
+        return redirect('/login/')
