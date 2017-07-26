@@ -101,7 +101,6 @@ def feed_view(request):
         return render(request, 'feed.html', {'posts': posts})
     else:
         return redirect('/login/')
-    return render(request, 'feed.html', {})
 
 
 def like_view(request):
@@ -127,8 +126,7 @@ def comment_view(request):
         if form.is_valid():
             post_id = form.cleaned_data.get('post').id
             comment_text = form.cleaned_data.get('comment_text')
-            comment = CommentModel.objects.create(user=user, post_id=post_id, comment_text=comment_text)
-            comment.save()
+            CommentModel.objects.create(user=user, post_id=post_id, comment_text=comment_text)
             return redirect('/feed/')
         else:
             return redirect('/feed/')
