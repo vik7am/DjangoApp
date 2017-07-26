@@ -62,10 +62,8 @@ def login_view(request):
 def check_validation(request):
     if request.COOKIES.get("session_token"):
         session = SessionToken.objects.filter(session_token=request.COOKIES.get("session_token")).first()
-        if session:
+        if session.is_valid:
            return session.user
-    else:
-        return None
 
 
 def post_view(request):
@@ -132,3 +130,11 @@ def comment_view(request):
             return redirect('/feed/')
     else:
         return redirect('/login')
+
+def logout_view(request):
+    user = check_validation(request)
+    if user:
+        token=SessionToken.objects.get(session_token=request.COOKIES.get("session_token"))
+        token.is_valid=False
+        token.save()
+    return redirect('/login/')
