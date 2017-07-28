@@ -1,54 +1,53 @@
 <!DOCTYPE html>
 
-<head>
-    <title>Feed</title>
+<html>
+<title>W3.CSS</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}" >
-</head>
 
 <body>
-    <div id="header"> Instagram</div>
-    <div id="heading1">Welcome to Instagram</div>
-    <div align="center">
-        <div style="border: 2px solid ; width:640px; padding: 25px 0px; background-color:white; color:#009688; font-size:30px; ">
-            <a href="/post/">Add a new Post </a>
-        </div>
-    </div>
+    <div class="w3-bar w3-xlarge w3-teal">
+        <h1 class="w3-center">Instagram</h1>
+    </div><br><br>
 
-    <div align="center" style="margin-top:50px; font-size:20px">
-        {% for post in posts %}
-            <div id="form" style="width:640px; color:#00796B; padding:0px; margin-top:50px">
-                <div style="font-size:35px; padding:10px;text-align:left">{{ post.user.username}} </div>
-                <div style="border: 1px solid ;"></div>
-                <img src="{{ post.image_url }}" width="640px">
-                <div style="font-size:20px; padding:10px; text-align:left">{{ post.caption}}</div>
+    {% for post in posts %}
+    <div class="w3-container w3-margin">
+        <div class="w3-container">
+            <h2>{{ post.user.username}}</h2>
+            <h4>{{ post.caption}}</h4>
+        </div>
+        <div class="w3-container w3-half" >
+  	        <div class="w3-card-4">
+                <img src="{{post.image_url}}" class="w3-round" alt="Norway" style="width:100%;">
+  	        </div><br>
+            <div>
                 <form method="POST" action="/like/" align="left">
                     {% csrf_token %}
                     <input type="hidden" name="post" value="{{ post.id }}">
                     {% if post.has_liked %}
-                        <input type="submit" class="button" value="Unlike">
+                        <input type="submit" class="w3-btn w3-blue" value="Liked">
                     {% else %}
-                        <input type="submit" class="button" value="Like">
+                        <input type="submit" class="w3-btn w3-text-blue w3-border w3-border-blue" value="Like">
                     {% endif %}
-                    <div style="display:inline-block">
-                        {{ post.like_count }} likes this
-                    </div>
+                    <label class="w3-text-blue w3-right" style="margin:8px">{{ post.like_count }}</label>
                 </form>
-                <form method="POST" action="/comment/">
-                        {% csrf_token %}
-                        <input type="hidden" name="post" value="{{ post.id }}" >
-                        <input type="text" name="comment_text" id="comment_text" placeholder="Make a comment.." value="{{ comment_text }}">
-                        <input type="submit" class="button" value="Comment">
-                </form>
-                <div style="text-align:left; margin:10px;">
-                    {% for comment in post.comments %}
-                        <p><b>{{ comment.user.username }}:</b> {{ comment.comment_text }}</p>
-                    {% endfor %}
-                </div>
 
             </div>
-        {% endfor %}
-    </div>
-</body>
+        </div>
+        <div class="w3-container w3-half">
+            <div style="text-align:left; margin:10px;">
+                {% for comment in post.comments %}
+                    <h4><b>{{ comment.user.username }}:</b> {{ comment.comment_text }}</h4>
+                {% endfor %}
+            </div>
+            <form method="POST" action="/comment/">
+                {% csrf_token %}
+                <input type="hidden" name="post" value="{{ post.id }}" >
+                <input class="w3-input" type="text" name="comment_text" placeholder="Comments" value="{{ comment_text }}"><br>
+            </form>
+        </div>
+    </div><br><hr><br>
+    {% endfor %}
 
+</body>
 </html>
