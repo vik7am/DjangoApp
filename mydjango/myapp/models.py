@@ -48,3 +48,14 @@ class CommentModel(models.Model):
     comment_text = models.CharField(max_length=555)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+
+class BrandModel(models.Model):
+    name = models.CharField(max_length=255)
+    points = models.IntegerField(default=1)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+class PointsModel(models.Model):
+    user = models.ForeignKey(UserModel)
+    brand = models.ForeignKey(BrandModel)
+    points = models.IntegerField(default=1)

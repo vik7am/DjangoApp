@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 from datetime import datetime
 from django.shortcuts import render, redirect, render_to_response
 from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm
-from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel
+from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel, BrandModel, PointsModel
 from django.contrib.auth.hashers import make_password, check_password
 from imgurpython import ImgurClient
+from clarifai.rest import ClarifaiApp
 from mydjango.settings import BASE_DIR
-from django.contrib import messages
+import demjson
 
 
 def signup_view(request):
@@ -138,3 +139,54 @@ def logout_view(request):
         token.is_valid=False
         token.save()
     return redirect('/login/')
+
+
+def win_view(request):
+    image_url="https://staticdelivery.nexusmods.com/mods/110/images/74627-0-1459502036.jpg"
+    caption = "samsung mobile phones are the best"
+    brands_in_caption=0
+    brand_selected=""
+    points=0;
+    brands = BrandModel.objects.all()
+    
+    for brand in brands:
+        if caption.__contains__(brand.name):
+            brand_selected=brand.name
+            brands_in_caption+=1
+    print "n:"+str(brands_in_caption)
+    image_caption = verify_image(image_url)
+
+    if brands_in_caption==1:
+        points+=50
+        if image_caption.__contains__(brand_selected):
+            points+=50
+            print brand_selected+":"+image_caption
+            print "Text 1 Image 1 "
+        else:
+            print brand_selected+":"+image_caption
+            print "Text 1 Image 0 "
+    else:
+        if image_caption == "":
+            print "Text 0 Image 0"
+        else:
+            if brands.__contains__(image_caption):
+                print image_caption
+                print "Text 0 Image 1"
+                points += 50
+            else:
+                print image_caption
+                print "Text 0 Image -1"
+
+    print "Total Points: "+str(points)
+    return redirect("/login/")
+
+def verify_image(image_url):
+
+    app = ClarifaiApp(api_key="df8a297f61d746a9b70f5a1c3bc5e2d8")
+    model = app.models.get("logo")
+    responce = model.predict_by_url(url=image_url)
+    print demjson.encode(responce)
+    if responce["outputs"][0]["data"]:
+        return responce["outputs"][0]["data"]["regions"][0]["data"]["concepts"][0]["name"].lower()
+    else:
+        return ""
