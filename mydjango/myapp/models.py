@@ -59,3 +59,6 @@ class PointsModel(models.Model):
     user = models.ForeignKey(UserModel)
     brand = models.ForeignKey(BrandModel)
     points = models.IntegerField(default=1)
+    total_points = 0
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)

@@ -15,18 +15,14 @@ def signup_view(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
-            print "form is valid"
             username = form.cleaned_data["username"]
             name = form.cleaned_data["name"]
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
-            #user = UserModel(name=name, password=make_password(password), email=email, username=username)
-            #user.save()
-            print "Id created"
+            user = UserModel(name=name, password=make_password(password), email=email, username=username)
+            user.save()
             return render(request, "index.html", {"form": form, "error": "Id Created"})
-            #return redirect("/login/")
         else:
-            print "invalid form"
             return render(request, "index.html", {"form": form,"error": "Invalid data"})
     elif request.method == "GET":
         form = SignUpForm()
@@ -45,15 +41,12 @@ def login_view(request):
                     token = SessionToken(user=user)
                     token.create_token()
                     token.save()
-                    print "Welcome"
                     response = redirect("/feed/")
                     response.set_cookie(key="session_token", value=token.session_token)
                     return response
                 else:
-                    print "Incorrect password"
                     return render(request, "login.html", {"form": form, "error": "Invalid password"})
             else:
-                print "username is invalid"
                 return render(request, "login.html", {"form": form,"error":"Invalid username"})
     elif request.method == "GET":
         form = LoginForm()
@@ -72,6 +65,7 @@ def post_view(request):
     if user:
         if request.method == 'GET':
             form = PostForm()
+            return render(request, 'post.html', {'form': form, 'user': user})
         elif request.method == 'POST':
             form = PostForm(request.POST, request.FILES)
             if form.is_valid():
@@ -83,8 +77,11 @@ def post_view(request):
                 client = ImgurClient("48b3c07ebcf5ecb", "af316e94ac2544c61623ed0fe4a80f2ce928ce33")
                 post.image_url = client.upload_from_path(path, anon=True)['link']
                 post.save()
-                return redirect('/feed/')
-        return render(request, 'post.html', {'form': form})
+                points=win_points(user,post.image_url,caption)
+                return render(request, 'post.html', {'form': form, 'user': user,'error':points})
+            else:
+                return render(request, 'post.html', {'form': form, 'user': user,'error':"Unable to Add Post"})
+
     else:
         return redirect('/login/')
 
@@ -97,7 +94,20 @@ def feed_view(request):
             existing_like = LikeModel.objects.filter(post_id=post.id, user=user).first()
             if existing_like:
                 post.has_liked = True
-        return render(request, 'feed.html', {'posts': posts})
+        return render(request, 'feed.html', {'posts': posts,'user':user})
+    else:
+        return redirect('/login/')
+
+
+def self_view(request):
+    user = check_validation(request)
+    if user:
+        posts = PostModel.objects.filter(user=user).order_by('-created_on')
+        for post in posts:
+            existing_like = LikeModel.objects.filter(post_id=post.id, user=user).first()
+            if existing_like:
+                post.has_liked = True
+        return render(request, 'feed.html', {'posts': posts,'user':user})
     else:
         return redirect('/login/')
 
@@ -141,9 +151,7 @@ def logout_view(request):
     return redirect('/login/')
 
 
-def win_view(request):
-    image_url="https://staticdelivery.nexusmods.com/mods/110/images/74627-0-1459502036.jpg"
-    caption = "samsung mobile phones are the best"
+def win_points(user,image_url,caption):
     brands_in_caption=0
     brand_selected=""
     points=0;
@@ -153,40 +161,39 @@ def win_view(request):
         if caption.__contains__(brand.name):
             brand_selected=brand.name
             brands_in_caption+=1
-    print "n:"+str(brands_in_caption)
     image_caption = verify_image(image_url)
-
     if brands_in_caption==1:
         points+=50
         if image_caption.__contains__(brand_selected):
             points+=50
-            print brand_selected+":"+image_caption
-            print "Text 1 Image 1 "
-        else:
-            print brand_selected+":"+image_caption
-            print "Text 1 Image 0 "
     else:
-        if image_caption == "":
-            print "Text 0 Image 0"
-        else:
-            if brands.__contains__(image_caption):
-                print image_caption
-                print "Text 0 Image 1"
+        if image_caption != "":
+            if BrandModel.objects.filter(name=image_caption):
                 points += 50
-            else:
-                print image_caption
-                print "Text 0 Image -1"
-
-    print "Total Points: "+str(points)
-    return redirect("/login/")
+    if points >= 50:
+        brand = BrandModel.objects.filter(name=brand_selected).first()
+        PointsModel.objects.create(user=user,brand=brand)
+        return "Post Added with 1 points"
+    else:
+        return "Post Added"
 
 def verify_image(image_url):
 
     app = ClarifaiApp(api_key="df8a297f61d746a9b70f5a1c3bc5e2d8")
     model = app.models.get("logo")
     responce = model.predict_by_url(url=image_url)
-    print demjson.encode(responce)
-    if responce["outputs"][0]["data"]:
-        return responce["outputs"][0]["data"]["regions"][0]["data"]["concepts"][0]["name"].lower()
+    if responce["status"]["code"]==10000:
+        if responce["outputs"][0]["data"]:
+            return responce["outputs"][0]["data"]["regions"][0]["data"]["concepts"][0]["name"].lower()
+    return ""
+
+def points_view(request):
+    user = check_validation(request)
+    if user:
+
+        points_model = PointsModel.objects.filter(user=user).order_by('-created_on')
+        points_model.total_points = len(PointsModel.objects.filter(user=user))
+        brands = BrandModel.objects.all()
+        return render(request, 'points.html', {'points_model':points_model,'brands':brands,'user':user})
     else:
-        return ""
+        return redirect('/login/')
