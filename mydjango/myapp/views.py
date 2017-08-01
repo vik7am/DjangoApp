@@ -14,7 +14,9 @@ from mydjango.settings import BASE_DIR
 Client_ID="48b3c07ebcf5ecb"
 Client_secret="af316e94ac2544c61623ed0fe4a80f2ce928ce33"
 Clarifai_key="df8a297f61d746a9b70f5a1c3bc5e2d8"
-SENDGRID_API_KEY="PRIVATE"
+#SENDGRID_API_KEY="PRIVATE"
+API_KEY="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"
+
 
 
 def signup_view(request):
@@ -27,7 +29,9 @@ def signup_view(request):
             password = form.cleaned_data["password"]
             user = UserModel(name=name, password=make_password(password), email=email, username=username)
             user.save()
-            send_mail(email)
+            subject="Weclome to InsaClone"
+            message="Hello " + name + "\nWelcome to InstaClone" + " Instaclone allows users to upload images of a certain brand or product to win points."
+            send_email(email, subject, message)
             return render(request, "index.html", {"form": form, "error": "Id Created"})
         else:
             return render(request, "index.html", {"form": form,"error": "Invalid data"})
@@ -134,6 +138,12 @@ def like_view(request):
             existing_like = LikeModel.objects.filter(post_id=post_id, user=user).first()
             if not existing_like:
                 LikeModel.objects.create(post_id=post_id, user=user)
+                subject = "InstaClone Like Notification"
+                post = PostModel.objects.filter(id=post_id).first()
+                creator = UserModel.objects.filter(id=post.user_id).first()
+                message = "Hello %s \n%s (%s) liked your photo" %(creator.name, user.username, user.name)
+                print creator.email
+                send_email(str(creator.email), subject, message)
             else:
                 existing_like.delete()
             return redirect('/feed/')
@@ -149,6 +159,11 @@ def comment_view(request):
             post_id = form.cleaned_data.get('post').id
             comment_text = form.cleaned_data.get('comment_text')
             CommentModel.objects.create(user=user, post_id=post_id, comment_text=comment_text)
+            subject = "InstaClone Comment Notification"
+            post = PostModel.objects.filter(id=post_id).first()
+            creator = UserModel.objects.filter(id=post.user_id).first()
+            message = "Hello %s \n%s (%s) commented your photo\n%s " % (creator.name, user.username, user.name, comment_text)
+            send_email(creator.email, subject, message)
             return redirect('/feed/')
         else:
             return redirect('/feed/')
@@ -212,6 +227,7 @@ def win_points(user,image_url,caption):
     else:
         return "Post Added"
 
+
 def verify_image(image_url):
     try:
         app = ClarifaiApp(api_key=Clarifai_key)
@@ -225,10 +241,10 @@ def verify_image(image_url):
         print "Unable to connect to internet"
         return ""
 
+
 def points_view(request):
     user = check_validation(request)
     if user:
-
         points_model = PointsModel.objects.filter(user=user).order_by('-created_on')
         points_model.total_points = len(PointsModel.objects.filter(user=user))
         brands = BrandModel.objects.all()
@@ -236,13 +252,13 @@ def points_view(request):
     else:
         return redirect('/login/')
 
-def send_mail(email):
+
+def send_email(email_id, subject, message):
     try:
-        sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
-        from_email = Email("vikrantseth2011@gmail.com")
-        to_email = Email(email)
-        subject = "Send with SendGrid API"
-        content = Content("text/plain", "Sending with SendGrid is Fun and easy to do anywhere, even with Python")
+        sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+        from_email = Email("vikrant_green@hotmail.com")
+        to_email = Email(email_id)
+        content = Content("text/plain", message)
         mail = Mail(from_email, subject, to_email, content)
         response = sg.client.mail.send.post(request_body=mail.get())
         print response.status_code
