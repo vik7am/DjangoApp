@@ -15,7 +15,6 @@ Client_ID="48b3c07ebcf5ecb"
 Client_secret="af316e94ac2544c61623ed0fe4a80f2ce928ce33"
 Clarifai_key="df8a297f61d746a9b70f5a1c3bc5e2d8"
 #SENDGRID_API_KEY="PRIVATE"
-API_KEY="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"
 
 
 
