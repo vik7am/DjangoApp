@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from datetime import datetime
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect
 from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm, CommentLikeForm
 from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel, BrandModel, PointsModel, CommentLikeModel
 from django.contrib.auth.hashers import make_password, check_password
 from imgurpython import ImgurClient
 from clarifai.rest import ClarifaiApp
+import sendgrid
+from sendgrid.helpers.mail import *
 from mydjango.settings import BASE_DIR
-import demjson
+
 
 Client_ID="48b3c07ebcf5ecb"
 Client_secret="af316e94ac2544c61623ed0fe4a80f2ce928ce33"
 Clarifai_key="df8a297f61d746a9b70f5a1c3bc5e2d8"
+SENDGRID_API_KEY="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"
 
 
 def signup_view(request):
@@ -25,6 +27,7 @@ def signup_view(request):
             password = form.cleaned_data["password"]
             user = UserModel(name=name, password=make_password(password), email=email, username=username)
             user.save()
+            send_mail(email)
             return render(request, "index.html", {"form": form, "error": "Id Created"})
         else:
             return render(request, "index.html", {"form": form,"error": "Invalid data"})
@@ -158,11 +161,10 @@ def upvote_view(request):
     if user and request.method == 'POST':
         form = CommentLikeForm(request.POST)
         if form.is_valid():
-            post_id = form.cleaned_data.get('post').id
             comment_id = form.cleaned_data.get('comment').id
-            existing_comment_like = CommentLikeModel.objects.filter(comment_id=comment_id,post_id=post_id, user=user).first()
+            existing_comment_like = CommentLikeModel.objects.filter(comment_id=comment_id, user=user).first()
             if not existing_comment_like:
-                CommentLikeModel.objects.create(comment_id=comment_id,post_id=post_id, user=user)
+                CommentLikeModel.objects.create(comment_id=comment_id, user=user)
             else:
                 existing_comment_like.delete()
             return redirect('/feed/')
@@ -228,3 +230,16 @@ def points_view(request):
         return render(request, 'points.html', {'points_model':points_model,'brands':brands,'user':user})
     else:
         return redirect('/login/')
+
+def send_mail(email):
+    try:
+        sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
+        from_email = Email("vikrantseth2011@gmail.com")
+        to_email = Email(email)
+        subject = "Send with SendGrid API"
+        content = Content("text/plain", "Sending with SendGrid is Fun and easy to do anywhere, even with Python")
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        print response.status_code
+    except:
+        print "Unable to send email"

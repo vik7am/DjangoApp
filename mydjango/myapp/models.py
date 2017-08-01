@@ -35,10 +35,11 @@ class PostModel(models.Model):
         return len(LikeModel.objects.filter(post=self))
     @property
     def comments(self):
-        model = CommentModel.objects.filter(post=self).order_by('created_on')
-        for m in model:
-            m.has_comment_liked = CommentLikeModel.objects.filter(user=self.current_user,comment_id=m.id).first()
-        return model
+        comment_model = CommentModel.objects.filter(post=self).order_by('created_on')
+        for model in comment_model:
+            model.has_comment_liked = CommentLikeModel.objects.filter(user=self.current_user,comment_id=model.id).first()
+        return comment_model
+
 
 class LikeModel(models.Model):
     user = models.ForeignKey(UserModel)
@@ -59,7 +60,6 @@ class CommentModel(models.Model):
 
 class CommentLikeModel(models.Model):
     user = models.ForeignKey(UserModel)
-    post = models.ForeignKey(PostModel)
     comment = models.ForeignKey(CommentModel)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)

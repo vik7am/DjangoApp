@@ -50,7 +50,6 @@
                     <div class="w3-row " style="margin: 8px 0px">
                         <form method="POST" action="/upvote/" align="left">
                             {% csrf_token %}
-                            <input type="hidden" name="post" value="{{ post.id }}">
                             <input type="hidden" name="comment" value="{{ comment.id }}">
                             {% if comment.has_comment_liked %}
                                 <div class="w3-col" style="width:75px"><input type="submit" class="w3-button w3-blue" value="{{comment.like_count}}"></div>
