@@ -163,10 +163,15 @@ def upvote_view(request):
         if form.is_valid():
             comment_id = form.cleaned_data.get('comment').id
             existing_comment_like = CommentLikeModel.objects.filter(comment_id=comment_id, user=user).first()
+            comment = CommentModel.objects.get(id=comment_id, user=user)
+            print str(comment.votes)
             if not existing_comment_like:
                 CommentLikeModel.objects.create(comment_id=comment_id, user=user)
+                comment.votes+= 1
             else:
                 existing_comment_like.delete()
+                comment.votes-= 1
+            comment.save()
             return redirect('/feed/')
     else:
         return redirect('/login/')

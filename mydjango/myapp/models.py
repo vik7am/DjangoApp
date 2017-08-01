@@ -35,7 +35,7 @@ class PostModel(models.Model):
         return len(LikeModel.objects.filter(post=self))
     @property
     def comments(self):
-        comment_model = CommentModel.objects.filter(post=self).order_by('created_on')
+        comment_model = CommentModel.objects.filter(post=self).order_by('-votes')
         for model in comment_model:
             model.has_comment_liked = CommentLikeModel.objects.filter(user=self.current_user,comment_id=model.id).first()
         return comment_model
@@ -51,6 +51,7 @@ class CommentModel(models.Model):
     user = models.ForeignKey(UserModel)
     post = models.ForeignKey(PostModel)
     comment_text = models.CharField(max_length=555)
+    votes = models.IntegerField(default=0)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     has_comment_liked = False
