@@ -29,12 +29,16 @@ class PostModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     has_liked = False
+    current_user = None
     @property
     def like_count(self):
         return len(LikeModel.objects.filter(post=self))
     @property
     def comments(self):
-        return CommentModel.objects.filter(post=self).order_by('created_on')
+        model = CommentModel.objects.filter(post=self).order_by('created_on')
+        for m in model:
+            m.has_comment_liked = CommentLikeModel.objects.filter(user=self.current_user,comment_id=m.id).first()
+        return model
 
 class LikeModel(models.Model):
     user = models.ForeignKey(UserModel)
@@ -48,6 +52,18 @@ class CommentModel(models.Model):
     comment_text = models.CharField(max_length=555)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    has_comment_liked = False
+    @property
+    def like_count(self):
+        return len(CommentLikeModel.objects.filter(comment=self))
+
+class CommentLikeModel(models.Model):
+    user = models.ForeignKey(UserModel)
+    post = models.ForeignKey(PostModel)
+    comment = models.ForeignKey(CommentModel)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
 
 class BrandModel(models.Model):
     name = models.CharField(max_length=255)

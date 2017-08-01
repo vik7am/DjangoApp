@@ -2,13 +2,17 @@
 from __future__ import unicode_literals
 from datetime import datetime
 from django.shortcuts import render, redirect, render_to_response
-from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm
-from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel, BrandModel, PointsModel
+from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm, CommentLikeForm
+from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel, BrandModel, PointsModel, CommentLikeModel
 from django.contrib.auth.hashers import make_password, check_password
 from imgurpython import ImgurClient
 from clarifai.rest import ClarifaiApp
 from mydjango.settings import BASE_DIR
 import demjson
+
+Client_ID="48b3c07ebcf5ecb"
+Client_secret="af316e94ac2544c61623ed0fe4a80f2ce928ce33"
+Clarifai_key="df8a297f61d746a9b70f5a1c3bc5e2d8"
 
 
 def signup_view(request):
@@ -74,9 +78,14 @@ def post_view(request):
                 post = PostModel(user=user, image=image, caption=caption)
                 path = str(BASE_DIR +"/user_images/"+ post.image.url)
                 post.save()
-                client = ImgurClient("48b3c07ebcf5ecb", "af316e94ac2544c61623ed0fe4a80f2ce928ce33")
-                post.image_url = client.upload_from_path(path, anon=True)['link']
-                post.save()
+                try:
+                    client = ImgurClient(Client_ID, Client_secret)
+                    post.image_url = client.upload_from_path(path, anon=True)['link']
+                    post.save()
+                except:
+                    print "Unable to connect to internet"
+                    post.delete()
+                    return render(request, 'post.html', {'form': form, 'user': user, 'error': "Internet Connectivity Issue"})
                 points=win_points(user,post.image_url,caption)
                 return render(request, 'post.html', {'form': form, 'user': user,'error':points})
             else:
@@ -92,9 +101,10 @@ def feed_view(request):
         posts = PostModel.objects.all().order_by('-created_on')
         for post in posts:
             existing_like = LikeModel.objects.filter(post_id=post.id, user=user).first()
+            post.current_user=user
             if existing_like:
                 post.has_liked = True
-        return render(request, 'feed.html', {'posts': posts,'user':user})
+        return render(request, 'feed.html', {'posts': posts, 'user':user})
     else:
         return redirect('/login/')
 
@@ -142,6 +152,24 @@ def comment_view(request):
     else:
         return redirect('/login')
 
+
+def upvote_view(request):
+    user = check_validation(request)
+    if user and request.method == 'POST':
+        form = CommentLikeForm(request.POST)
+        if form.is_valid():
+            post_id = form.cleaned_data.get('post').id
+            comment_id = form.cleaned_data.get('comment').id
+            existing_comment_like = CommentLikeModel.objects.filter(comment_id=comment_id,post_id=post_id, user=user).first()
+            if not existing_comment_like:
+                CommentLikeModel.objects.create(comment_id=comment_id,post_id=post_id, user=user)
+            else:
+                existing_comment_like.delete()
+            return redirect('/feed/')
+    else:
+        return redirect('/login/')
+
+
 def logout_view(request):
     user = check_validation(request)
     if user:
@@ -178,14 +206,17 @@ def win_points(user,image_url,caption):
         return "Post Added"
 
 def verify_image(image_url):
-
-    app = ClarifaiApp(api_key="df8a297f61d746a9b70f5a1c3bc5e2d8")
-    model = app.models.get("logo")
-    responce = model.predict_by_url(url=image_url)
-    if responce["status"]["code"]==10000:
-        if responce["outputs"][0]["data"]:
-            return responce["outputs"][0]["data"]["regions"][0]["data"]["concepts"][0]["name"].lower()
-    return ""
+    try:
+        app = ClarifaiApp(api_key=Clarifai_key)
+        model = app.models.get("logo")
+        responce = model.predict_by_url(url=image_url)
+        if responce["status"]["code"] == 10000:
+            if responce["outputs"][0]["data"]:
+                return responce["outputs"][0]["data"]["regions"][0]["data"]["concepts"][0]["name"].lower()
+        return ""
+    except:
+        print "Unable to connect to internet"
+        return ""
 
 def points_view(request):
     user = check_validation(request)
