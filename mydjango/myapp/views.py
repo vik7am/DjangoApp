@@ -211,14 +211,18 @@ def win_points(user,image_url,caption):
             brand_selected=brand.name
             brands_in_caption+=1
     image_caption = verify_image(image_url)
+    print image_caption
     if brands_in_caption==1:
         points+=50
         if image_caption.__contains__(brand_selected):
             points+=50
     else:
         if image_caption != "":
-            if BrandModel.objects.filter(name=image_caption):
-                points += 50
+            for brand in brands:
+                if image_caption.__contains__(brand.name):
+                    brand_selected=brand.name
+                    points += 50
+                    break
     if points >= 50:
         brand = BrandModel.objects.filter(name=brand_selected).first()
         PointsModel.objects.create(user=user,brand=brand)
