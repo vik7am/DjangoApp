@@ -177,7 +177,8 @@ def upvote_view(request):
         if form.is_valid():
             comment_id = form.cleaned_data.get('comment').id
             existing_comment_like = CommentLikeModel.objects.filter(comment_id=comment_id, user=user).first()
-            comment = CommentModel.objects.get(id=comment_id, user=user)
+            print comment_id
+            comment = CommentModel.objects.get(id=comment_id)
             print str(comment.votes)
             if not existing_comment_like:
                 CommentLikeModel.objects.create(comment_id=comment_id, user=user)
@@ -257,6 +258,7 @@ def points_view(request):
 
 
 def send_email(email_id, subject, message):
+    return None
     try:
         sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
         from_email = Email("vikrant_green@hotmail.com")
